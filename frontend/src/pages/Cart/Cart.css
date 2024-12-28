@@ -1,0 +1,130 @@
+.nothing {
+  text-align: center;
+  font-size: 1.5rem;
+  margin-top: 50px;
+  color: #6b2737; /* Dark maroon text for better contrast */
+  margin-bottom: 600px;
+}
+
+.table_cart {
+  width: 90%;
+  margin: 20px auto;
+  border-collapse: collapse;
+  background-color: #ffe6e6; /* Light pink */
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 30px;
+}
+
+.th, td {
+  padding: 20px; /* Increased padding for larger row height */
+  text-align: center;
+  font-size: 1rem; /* Slightly larger font size for better readability */
+  color: #6b2737; /* Deep maroon for text */
+}
+
+.th {
+  background-color: #f8d7da; /* Softer pink */
+  font-weight: bold;
+}
+
+tr:nth-child(even) {
+  background-color: #fce4ec; /* Light pastel pink */
+}
+
+.table_cart tr:hover {
+  background-color: #fadadd; /* Slightly darker pink for hover */
+}
+
+.table_cart img {
+  width: 50px;
+  height: 50px;
+  border-radius: 5px;
+}
+
+.check {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 88%;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: #f8d7da; /* Soft pink */
+  border-radius: 8px;
+  margin-bottom: 350px;
+}
+
+.check p {
+  font-size: 1.7rem;
+  color: #6b2737; /* Deep maroon */
+}
+
+.check button {
+  background-color: #b83260; /* Bright pink */
+  color: #fff5f5; /* Very light pink for button text */
+  border: none;
+  padding: 12px 24px; /* Increased padding for a larger button */
+  font-size: 1.1rem; /* Slightly larger font size for buttons */
+  cursor: pointer;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+}
+
+.check button:hover {
+  background-color: #8b2245; /* Darker pink for hover */
+}
+
+.delete {
+  background-color: #e57373; /* Softer red */
+  color: #fff5f5; /* Very light pink text */
+  border: none;
+  padding: 7px 15px; /* Increased padding for better button size */
+  font-size: 1rem;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+}
+
+.delete:hover {
+  background-color: #c62828; /* Darker red for hover */
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .table_cart {
+    width: 100%;
+  }
+
+  .check {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .check button {
+    margin-top: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .table_cart {
+    width: 100%;
+  }
+
+  .nothing {
+    font-size: 1.2rem;
+  }
+
+  .check p {
+    font-size: 1.4rem;
+  }
+
+  .check button {
+    padding: 10px 20px;
+    font-size: 1rem;
+  }
+
+  .delete {
+    padding: 6px 12px;
+    font-size: 0.9rem;
+  }
+}
