@@ -1,0 +1,113 @@
+.login-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  font-family: 'Poppins', sans-serif;
+}
+
+.login-container h1 {
+  font-size: 2.5rem;
+  color: #333;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+.login-form {
+  width: 100%;
+  max-width: 450px;
+  background-color: #ffffff;
+  padding: 2.5rem 3rem;
+  border-radius: 15px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+  animation: fadeIn 0.8s ease-in-out;
+}
+
+.login-form label {
+  display: block;
+  font-size: 1.1rem;
+  color: #444;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.login-form input, .login-form select {
+  width: 100%;
+  padding: 0.75rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.login-form input:focus, .login-form select:focus {
+  outline: none;
+  border-color: #ff7b7b;
+  box-shadow: 0 0 5px rgba(255, 123, 123, 0.5);
+}
+
+.login-form button {
+  width: 100%;
+  padding: 0.9rem;
+  background-color: #ff7b7b;
+  color: #ffffff;
+  font-size: 1.1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.login-form button:hover {
+  background-color: #ff4d4d;
+  transform: translateY(-3px);
+  box-shadow: 0 6px 12px rgba(255, 77, 77, 0.3);
+}
+
+.register-link {
+  text-align: center;
+  margin-top: 1.5rem;
+}
+
+.register-link p {
+  font-size: 1rem;
+  color: #666;
+}
+
+.register-link a {
+  color: #ff7b7b;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.register-link a:hover {
+  text-decoration: underline;
+  color: #ff4d4d;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 600px) {
+  .login-form {
+    padding: 2rem;
+  }
+  .login-container h1 {
+    font-size: 2rem;
+  }
+  .login-form input, .login-form button {
+    font-size: 1rem;
+  }
+}
