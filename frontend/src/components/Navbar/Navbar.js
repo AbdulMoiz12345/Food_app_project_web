@@ -4,7 +4,7 @@ import { Itemcontext } from '../../ShopContextProvider';
 import './Navbar.css';
 import axios from 'axios';
 import pic1 from "../../assets/logo.png";
-
+//i chnaged the nav bar
 const Navbar = () => {
   const { userState, setUserState, cartitem, sellerId } = useContext(Itemcontext);
   const location = useLocation();

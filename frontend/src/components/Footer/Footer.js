@@ -1,6 +1,6 @@
 import React from 'react';
 import './Footer.css';
-
+//changes to the footer too
 const Footer = () => {
   return (
     <footer id="footer">
