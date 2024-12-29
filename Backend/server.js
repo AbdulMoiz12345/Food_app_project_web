@@ -74,7 +74,7 @@ io.on('connection', (socket) => {
     InWayOrder.find(role === 'Buyer' ? { buyerId: userId } : { riderId: userId })
       .then((orders) => {
         orders.forEach((order) => {
-          const roomName = order.foodName;
+          const roomName = order.items.map(item => item.foodName).join(', ');
           socket.join(roomName);
           console.log(`${role} joined room: ${roomName}`);
 
@@ -210,6 +210,8 @@ const storage = multer.diskStorage({
     cb(null, Date.now() + '-' + file.originalname); // Create unique filenames
   },
 });
+
+//Rider Section Started Here_____________________________________________________________________________________________________
 
 const upload = multer({ storage });
 
@@ -402,7 +404,7 @@ app.get('/api/seller-completed-orders/:sellerId', async (req, res) => {
   }
 });
 
-
+//Rider Section Ended Here_____________________________________________________________________________________________________
 
 
 // Buyer section ____________________________________________________________________________________________________________________//
@@ -463,7 +465,7 @@ app.get('/api/customer-orders/:buyerId', async (req, res) => {
     const orders = await Orders.find({ buyerId: buyerId }); // Use find() with buyerId
 
     // Fetch made orders (pending)
-    const madeOrders = await InWayOrder.find({ buyerId: buyerId }); // Use find() with buyerId
+    const madeOrders = await MadeOrder.find({ buyerId: buyerId }); // Use find() with buyerId
 
     // Fetch completed orders
     const completedOrders = await CompletedOrder.find({ buyerId: buyerId }); // Use find() with buyerId
@@ -480,29 +482,35 @@ app.get('/api/customer-orders/:buyerId', async (req, res) => {
     res.status(500).send('Server Error');
   }
 });
-
+// Buyer section Ended ____________________________________________________________________________________________________________________//
 
 
 //Rider section___________________________________________________________________________________________________________________//
 
 app.post('/api/inwayorder', async (req, res) => {
   try {
-    const { riderId, buyerId,sellerId, foodName, orderId,quantity,price } = req.body;
-    console.log("new checking")
-    console.log(sellerId)
-    console.log(buyerId)
-    console.log(quantity)
-    console.log(price)
-    if (!riderId || !buyerId || !foodName || !orderId) {
+    const { riderId, buyerId, sellerId, items } = req.body;
+    if (!riderId || !buyerId || !sellerId || !items || !Array.isArray(items)) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
 
-    // Save to InWayOrder
-    const inWayOrder = new InWayOrder({ riderId, buyerId,sellerId, foodName, orderId ,quantity,price});
+    // Create InWayOrder
+    const inWayOrder = new InWayOrder({
+      riderId,
+      buyerId,
+      sellerId,
+      items: items.map(item => ({
+        foodName: item.foodName,
+        quantity: item.quantity,
+        price: item.price,
+        orderId: item.orderId,  // Store the orderId for each food item
+      })),
+    });
+
     await inWayOrder.save();
 
-    // Remove the order from MadeOrder
-    await MadeOrder.findByIdAndDelete(orderId);
+    // Remove the items from MadeOrder by their orderId
+    await MadeOrder.deleteMany({ _id: { $in: items.map(item => item.orderId) } });
 
     res.status(201).json({ message: 'Order is on the way' });
   } catch (error) {
@@ -512,7 +520,6 @@ app.post('/api/inwayorder', async (req, res) => {
 });
 
 
-// Fetch orders for the rider
 app.get('/api/rider-orders', async (req, res) => {
   try {
     const { riderId } = req.query;
@@ -523,6 +530,8 @@ app.get('/api/rider-orders', async (req, res) => {
 
     // Check if the rider has orders in InWayOrder
     const inWayOrders = await InWayOrder.find({ riderId });
+    console.log('InWayOrders:', JSON.stringify(inWayOrders, null, 2)); // Log InWayOrder data in pretty format
+
     if (inWayOrders.length > 0) {
       // Get buyer and seller details for inWayOrders
       const ordersWithDetails = await Promise.all(
@@ -530,11 +539,9 @@ app.get('/api/rider-orders', async (req, res) => {
           const buyer = await User.findById(order.buyerId);
           const seller = await User.findById(order.sellerId);
 
-          return {
-            orderId: order.orderId,
-            foodName: order.foodName,
-            quantity: order.quantity,
-          price: order.price,
+          const orderDetails = {
+            orderId: order._id,  // InWayOrder ID
+            items: order.items,
             buyer: {
               address: buyer?.address,
               phone: buyer?.phone,
@@ -546,27 +553,33 @@ app.get('/api/rider-orders', async (req, res) => {
               email: seller?.email,
             },
           };
+
+          console.log('Order with details:', JSON.stringify(orderDetails, null, 2)); // Log each order with its details in pretty format
+
+          return orderDetails;
         })
       );
 
       return res.status(200).json({ success: true, hasOngoingOrder: true, orders: ordersWithDetails });
     }
 
-    // If no orders in InWayOrder, fetch all available orders
+    // If no orders in InWayOrder, fetch all available orders from MadeOrder
     const madeOrders = await MadeOrder.find();
+    console.log('MadeOrders:', JSON.stringify(madeOrders, null, 2)); // Log MadeOrder data in pretty format
 
-    const ordersWithDetails = await Promise.all(
-      madeOrders.map(async (order) => {
+    // Ensure asynchronous operations complete before reducing
+    const groupedOrders = await madeOrders.reduce(async (accPromise, order) => {
+      const acc = await accPromise; // Await the previous accumulation
+      const key = `${order.buyerId}-${order.sellerId}`;
+
+      // Fetch buyer and seller details only once for each buyer-seller combination
+      if (!acc[key]) {
         const buyer = await User.findById(order.buyerId);
         const seller = await User.findById(order.sellerId);
 
-        return {
-          orderId: order._id,
-          foodName: order.foodName,
-          quantity: order.quantity,
-          price: order.price,
-          buyerId:order.buyerId,
-          sellerId:order.sellerId,
+        acc[key] = {
+          buyerId: order.buyerId,
+          sellerId: order.sellerId,
           buyer: {
             address: buyer?.address,
             phone: buyer?.phone,
@@ -577,11 +590,33 @@ app.get('/api/rider-orders', async (req, res) => {
             phone: seller?.phone,
             email: seller?.email,
           },
+          items: [], // Initialize the items array for this group
         };
-      })
-    );
+      }
 
-    res.status(200).json({ success: true, hasOngoingOrder: false, orders: ordersWithDetails });
+      // Ensure all items for the same buyer-seller combination are added
+      acc[key].items.push({
+        orderId: order._id,
+        foodName: order.foodName,
+        quantity: order.quantity,
+        price: order.price,
+      });
+
+      return acc;
+    }, Promise.resolve({})); // Initial empty object wrapped in a resolved promise
+
+    // Convert the grouped object to an array for response
+    const groupedOrdersArray = Object.values(groupedOrders).map(group => ({
+      buyerId: group.buyerId,
+      sellerId: group.sellerId,
+      buyer: group.buyer,
+      seller: group.seller,
+      items: group.items,
+    }));
+
+    console.log('Grouped Orders:', JSON.stringify(groupedOrdersArray, null, 2)); // Log grouped orders
+    res.status(200).json({ success: true, hasOngoingOrder: false, orders: groupedOrdersArray });
+
   } catch (error) {
     console.error('Error fetching rider orders:', error);
     res.status(500).json({ success: false, message: 'Internal server error' });
@@ -589,49 +624,52 @@ app.get('/api/rider-orders', async (req, res) => {
 });
 
 
-app.patch('/api/rider-orders/:orderId/complete', async (req, res) => {
+
+
+// Handle order completion
+app.patch('/api/completeorder', async (req, res) => {
+  const { riderId, orderId } = req.body;
+  console.log(riderId)
+  console.log(orderId)
   try {
-    const { orderId } = req.params;
-    const { riderId } = req.body; // Retrieve the riderId from the request body
-
-    console.log("Marking order as complete with riderId:", riderId);
-
-    // Find and remove the order using `orderId`
-    const completedOrder = await InWayOrder.findOneAndDelete({ orderId: orderId });
-    if (!completedOrder) {
-      return res.status(404).json({ success: false, message: 'Order not found' });
+    // Find the InWayOrder by orderId and riderId
+    const inWayOrder = await InWayOrder.findOne({ riderId: riderId });
+    console.log(inWayOrder)
+    if (!inWayOrder) {
+      return res.status(404).send('Order not found or riderId mismatch');
     }
 
-    console.log(completedOrder);
+    // Process each item in the InWayOrder and create CompletedOrder for each
+    const completedOrders = inWayOrder.items.map(item => ({
+      foodName: item.foodName,
+      quantity: item.quantity,
+      price: item.price,
+      buyerId: inWayOrder.buyerId,
+      sellerId: inWayOrder.sellerId,
+      riderId: riderId,  // Use the rider's ID sent in the request
+      deliveredAt: new Date(), // Timestamp for delivery
+    }));
 
-    // Save the order to CompletedOrder table, including riderId
-    const newCompletedOrder = new CompletedOrder({
-      foodName: completedOrder.foodName,
-      quantity: completedOrder.quantity,
-      price: completedOrder.price,
-      buyerId: completedOrder.buyerId,
-      sellerId: completedOrder.sellerId,
-      riderId // Include riderId in the new record
-    });
+    // Save each item as a CompletedOrder
+    await CompletedOrder.insertMany(completedOrders);
 
-    console.log("Completed order details:", newCompletedOrder);
-    await newCompletedOrder.save();
+    // Delete the completed order from InWayOrder collection
+    await InWayOrder.deleteOne({ riderId: riderId  });
 
-    res.status(200).json({ success: true, message: 'Order marked as complete' });
+    res.status(200).send('Order marked as completed and moved to completed orders');
   } catch (error) {
-    console.error('Error marking order as complete:', error);
-    res.status(500).json({ success: false, message: 'Internal server error' });
+    console.error('Error completing the order:', error);
+    res.status(500).send('Server error');
   }
 });
 
 
-
-app.get('/api/rider-orders/:riderId', async (req, res) => {
+app.get('/api/rider-completed-orders/:riderId', async (req, res) => {
   const riderId = req.params.riderId;
 
   try {
     // Fetch completed orders for the rider
-    const completedOrders = await CompletedOrder.find({ riderId: riderId });
+    const completedOrders = await CompletedOrder.find({ riderId: riderId  });
 
     // Enhance completed orders with buyer and seller details
     const ordersWithDetails = await Promise.all(
@@ -668,6 +706,8 @@ app.get('/api/rider-orders/:riderId', async (req, res) => {
 
 
 
+
+//Rider section Ended___________________________________________________________________________________________________________________//
 // Start server
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);

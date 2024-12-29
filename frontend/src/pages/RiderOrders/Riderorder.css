@@ -1,0 +1,152 @@
+/* General Styling */
+.rider-orders-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+  }
+  
+  .rider-orders-header {
+    font-size: 2rem;
+    color: #4CAF50;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  /* Completed Orders */
+  .rider-completed-orders-container {
+    margin-bottom: 30px;
+  }
+  
+  .rider-completed-orders-header {
+    font-size: 1.5rem;
+    color: #4CAF50;
+    margin-bottom: 10px;
+  }
+  
+  /* Orders List */
+  .rider-orders-list {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .rider-order-item {
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    background: #fdfdfd;
+    transition: box-shadow 0.3s;
+  }
+  
+  .rider-order-item:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  }
+  
+  /* Order Details */
+  .rider-order-details {
+    display: grid;
+    grid-template-columns: 200px 1fr; /* Default: Two columns */
+    grid-gap: 10px; /* Add spacing between columns */
+    line-height: 1.6;
+  }
+  
+  .rider-order-details h4 {
+    grid-column: 1 / -1; /* Span both columns for the header */
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 10px;
+  }
+  
+  .rider-order-details p {
+    font-size: 1rem;
+    color: #666;
+    margin: 5px 0; /* Consistent spacing between rows */
+  }
+  
+  .rider-order-details span {
+    font-weight: bold; /* Highlight labels */
+  }
+  
+  .rider-order-status strong {
+    color: #4CAF50;
+  }
+  
+  /* No Orders Message */
+  .rider-no-orders-message {
+    font-size: 1rem;
+    color: #999;
+    text-align: center;
+    margin: 20px 0;
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .rider-orders-container {
+      margin: 10px; /* Add space on the left and right */
+      padding: 15px; /* Reduce padding slightly */
+    }
+  
+    .rider-orders-header {
+      font-size: 1.5rem;
+    }
+  
+    .rider-completed-orders-header {
+      font-size: 1.2rem;
+    }
+  
+    .rider-order-item {
+      padding: 10px;
+    }
+  
+    .rider-order-details {
+      grid-template-columns: 1fr; /* Single column for smaller screens */
+    }
+  
+    .rider-order-item h4 {
+      font-size: 1rem;
+    }
+  
+    .rider-order-item p {
+      font-size: 0.9rem;
+    }
+  
+    .rider-no-orders-message {
+      font-size: 0.9rem;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .rider-orders-header {
+      font-size: 1.2rem;
+    }
+  
+    .rider-completed-orders-header {
+      font-size: 1rem;
+    }
+  
+    .rider-order-item {
+      padding: 8px;
+    }
+  
+    .rider-order-details {
+      grid-template-columns: 1fr; /* Single column for very small screens */
+    }
+  
+    .rider-order-item h4 {
+      font-size: 1.1rem;
+    }
+  
+    .rider-order-item p {
+      font-size: 0.8rem;
+    }
+  
+    .rider-no-orders-message {
+      font-size: 0.8rem;
+    }
+  }
+  
