@@ -3,6 +3,7 @@ import { Itemcontext } from '../../ShopContextProvider';
 import './Cartitem.css';
 export default function Cartitem({ item }) {
   const { cartitem, setcartitem } = useContext(Itemcontext);
+//caritem being added
 
   const handleDelete = () => {
     // Use foodId as the unique identifier for deletion

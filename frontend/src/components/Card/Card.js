@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react';
 import './Card.css';
 import { Itemcontext } from '../../ShopContextProvider';
-
+//added card component
 export default function Card({ item }) {
   const { cartitem, setcartitem } = useContext(Itemcontext);
   const [quantity, setQuantity] = useState(1);
