@@ -1,7 +1,8 @@
 import React from 'react';
 import './Sellercard.css';
-const SellerCard = ({ foodItem, onDelete, onUpdate }) => {
-  const { _id, category, name, imageUrl, options, description } = foodItem;
+
+const ProductCard = ({ item, handleDelete, handleUpdate }) => {
+  const { _id, category, name, imageUrl, options, description } = item;
 
   return (
     <div className="seller-card">
@@ -17,10 +18,10 @@ const SellerCard = ({ foodItem, onDelete, onUpdate }) => {
           </li>
         ))}
       </ul>
-      <button onClick={() => onUpdate(_id)}>Update</button>
-      <button onClick={() => onDelete(_id)}>Delete</button>
+      <button onClick={() => handleUpdate(_id)}>Update</button>
+      <button onClick={() => handleDelete(_id)}>Delete</button>
     </div>
   );
 };
 
-export default SellerCard;
+export default ProductCard;
