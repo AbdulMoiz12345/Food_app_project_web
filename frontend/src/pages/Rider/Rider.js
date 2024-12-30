@@ -32,26 +32,23 @@ const Rider = () => {
     fetchOrders();
   }, [riderId]); // Fetch orders when riderId changes
 
-  // Handle marking an order as complete (individually for each food item)
-// Handle marking an order as complete
-const handleComplete = async (orderId) => {
-  try {
-    // Send only the riderId and orderId to the backend to mark the order as completed
-    await axios.patch('http://localhost:5000/api/completeorder', {
-      riderId, // Send the rider's ID
-      orderId, // Send the order ID to the backend
-    });
+  // Handle marking an order as complete
+  const handleComplete = async (orderId) => {
+    try {
+      // Send only the riderId and orderId to the backend to mark the order as completed
+      await axios.patch('http://localhost:5000/api/completeorder', {
+        riderId, // Send the rider's ID
+        orderId, // Send the order ID to the backend
+      });
 
-    // Remove completed items from the list of orders
-    setOrders((prevOrders) => prevOrders.filter((order) => order.orderId !== orderId));
-    setSelectedOrder(null); // Clear the selected order
-    setHasOngoingOrder(false); // Ensure no ongoing order
-  } catch (error) {
-    console.error('Error completing the order:', error);
-  }
-};
-
-
+      // Remove completed items from the list of orders
+      setOrders((prevOrders) => prevOrders.filter((order) => order.orderId !== orderId));
+      setSelectedOrder(null); // Clear the selected order
+      setHasOngoingOrder(false); // Ensure no ongoing order
+    } catch (error) {
+      console.error('Error completing the order:', error);
+    }
+  };
 
   // Handle taking the order
   const handleTakeOrder = async (order) => {
@@ -86,8 +83,8 @@ const handleComplete = async (orderId) => {
             <h2>In Progress</h2>
             <div className="popup-section">
               <h3>Food Details</h3>
-              {selectedOrder.items.map((item) => (
-                <div key={item.orderId} className='popup-section-details'>
+              {selectedOrder.items.map((item, idx) => (
+                <div key={item.orderId || idx} className='popup-section-details'>
                   <p><strong>Food Name:</strong> {item.foodName}</p>
                   <p><strong>Quantity:</strong> {item.quantity}</p>
                   <p><strong>Price:</strong> ${item.price}</p>
@@ -122,16 +119,16 @@ const handleComplete = async (orderId) => {
             <p>No orders available for delivery.</p>
           ) : (
             <div className="orders-list">
-              {orders.map((order) => (
+              {orders.map((order, index) => (
                 <div
-                  key={order.orderId}
+                  key={order.orderId || index}
                   className="order-card"
                   onClick={() => handleTakeOrder(order)}
                 >
                   <div className='order-details'>
                     <h3>Order from Seller: {order.seller.address}</h3>
-                    {order.items.map((item, index) => (
-                      <div key={index} className="item-details">
+                    {order.items.map((item, idx) => (
+                      <div key={idx} className="item-details">
                         <p><strong>Food Name:</strong> {item.foodName}</p>
                         <p><strong>Quantity:</strong> {item.quantity}</p>
                         <p><strong>Price:</strong> ${item.price}</p>
